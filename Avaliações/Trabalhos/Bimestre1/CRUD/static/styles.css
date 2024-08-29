@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    background: url('/static/background.jpg') no-repeat center center fixed; /* Usa a imagem JPEG como fundo */
+    background-size: cover; /* Faz a imagem cobrir toda a tela */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    position: relative; /* Posicionamento relativo para elementos dentro do body */
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.801); /* Fundo semitransparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    position: relative; /* Para o z-index funcionar */
+    z-index: 1; /* Sobrepor as linhas de fundo */
+}
+
+.toggle-role {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.toggle-role button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: #eee;
+    border-radius: 10px 10px 0 0;
+    color: #333;
+    font-weight: bold;
+}
+
+.toggle-role button.active {
+    background-color: #ff9900;
+    color: #fff;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    text-align: left;
+    font-weight: bold;
+}
+
+input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #ff9900;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e68a00;
+}
+
+.hidden {
+    display: none;
+}
+
+#toggle-text {
+    margin-top: 20px;
+    cursor: pointer;
+    color: #e7b14d;
+}
+
+#toggle-text span:hover {
+    text-decoration: underline;
+}
+
+/* Posicionamento do botão de logout */
+a.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #d9534f;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+a.logout-button:hover {
+    background-color: #c9302c;
+}
+
+/* Estilo para a logo */
+.logo {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 100px;
+    height: auto;
+    z-index: 2; /* Para sobrepor outros elementos de fundo */
+}

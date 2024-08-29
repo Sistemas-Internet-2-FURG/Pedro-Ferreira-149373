@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Biblioteca</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Logo da Universidade -->
+    <img src="/static/FURG_logo.png" alt="Logo FURG" class="logo">
+
+    <div class="login-container">
+        <h2 id="form-title">Login na Biblioteca</h2>
+
+        <!-- Formulário de Login -->
+        <form action="/login" method="POST" class="login-form">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Entrar</button>
+        </form>
+
+        <!-- Formulário de Registro -->
+        <form action="/register" method="POST" class="register-form hidden">
+            <div class="toggle-role">
+                <button type="button" id="toggle-reader" class="active">Leitor</button>
+                <button type="button" id="toggle-admin">Administrador</button>
+            </div>
+            <label for="new-username">Usuário:</label>
+            <input type="text" id="new-username" name="new_username" required>
+            
+            <label for="new-password">Senha:</label>
+            <input type="password" id="new-password" name="new_password" required>
+            
+            <input type="hidden" name="new_role" id="new-role" value="leitor">
+            
+            <button type="submit">Registrar</button>
+        </form>
+
+        <p id="toggle-text">Não tem uma conta? <span id="toggle-link">Clique aqui para registrar-se!</span></p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Alternar entre Leitor e Administrador no registro
+            $('.toggle-role button').click(function() {
+                $('.toggle-role button').removeClass('active');
+                $(this).addClass('active');
+                const role = $(this).text().toLowerCase();
+                $('#new-role').val(role);
+            });
+
+            // Alternar entre Login e Registro usando as frases
+            $(document).on('click', '#toggle-link', function() {
+                if ($('.login-form').hasClass('hidden')) {
+                    $('.login-form').removeClass('hidden');
+                    $('.register-form').addClass('hidden');
+                    $('#form-title').text('Login na Biblioteca');
+                    $('#toggle-text').html('Não tem uma conta? <span id="toggle-link">Clique aqui para registrar-se!</span>');
+                } else {
+                    $('.register-form').removeClass('hidden');
+                    $('.login-form').addClass('hidden');
+                    $('#form-title').text('Registro na Biblioteca');
+                    $('#toggle-text').html('Já tem uma conta? <span id="toggle-link">Clique aqui para fazer login!</span>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Biblioteca - Autores e Livros</title>
+    <link rel="stylesheet" href="/static/stylesIndex.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .tab {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #ff9900;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .tab:hover {
+            background-color: #f0ad49;
+        }
+
+        .form-container {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+        }
+
+        .logout-button-container {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .action-buttons button {
+            background-color: #f0ad49;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #ff9900;
+        }
+
+        li {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerenciamento de Biblioteca</h1>
+        
+        <!-- Posicionar botão de logout acima dos outros elementos -->
+        <div class="logout-button-container">
+            <a href="/logout" class="logout-button">Logout</a>
+        </div>
+        
+        <!-- Abas para adicionar autores e livros - Apenas para administradores -->
+        <div id="admin-section" class="hidden">
+            <div class="tab" id="tab-adicionar-autor">Adicionar Novo Autor</div>
+            <div class="form-container" id="form-adicionar-autor">
+                <form id="form-autor">
+                    <input type="text" id="nome" placeholder="Nome" required>
+                    <input type="text" id="nacionalidade" placeholder="Nacionalidade">
+                    <input type="text" id="data_nascimento" placeholder="Data de Nascimento">
+                    <button type="submit">Adicionar Autor</button>
+                </form>
+            </div>
+
+            <div class="tab" id="tab-adicionar-livro">Adicionar Novo Livro</div>
+            <div class="form-container" id="form-adicionar-livro">
+                <form id="form-livro">
+                    <input type="text" id="titulo" placeholder="Título" required>
+                    <input type="text" id="genero" placeholder="Gênero">
+                    <input type="text" id="data_publicacao" placeholder="Data de Publicação">
+                    <input type="text" id="localizacao" placeholder="Localização">
+                    <input type="text" id="idioma" placeholder="Idioma">
+                    <select id="tipo_obra" class="custom-select">
+                        <option value="Livro">Livro</option>
+                        <option value="Artigo">Artigo</option>
+                        <option value="Dissertação">Dissertação</option>
+                        <option value="Tese">Tese</option>
+                        <option value="TCCG">TCCG</option>
+                    </select>
+                    <label>Autores Primários (IDs separados por vírgula):</label>
+                    <input type="text" id="autores_primarios" placeholder="Ex: 1,2,3">
+                    <label>Autores Secundários (IDs separados por vírgula):</label>
+                    <input type="text" id="autores_secundarios" placeholder="Ex: 4,5">
+                    <button type="submit">Adicionar Livro</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Seção de busca de livros - Apenas para usuários -->
+        <div id="usuario-section" class="hidden">
+            <h2>Buscar Livros</h2>
+            <input type="text" id="busca-titulo" placeholder="Buscar por Título">
+            <input type="text" id="busca-autor" placeholder="Buscar por Autor">
+            <input type="text" id="busca-genero" placeholder="Buscar por Gênero">
+            <input type="text" id="busca-data" placeholder="Buscar por Data de Publicação">
+            <input type="text" id="busca-localizacao" placeholder="Buscar por Localização">
+            <input type="text" id="busca-idioma" placeholder="Buscar por Idioma">
+            <select id="busca-tipo-obra" class="custom-select">
+                <option value="">Todos os Tipos</option>
+                <option value="Livro">Livro</option>
+                <option value="Artigo">Artigo</option>
+                <option value="Dissertação">Dissertação</option>
+                <option value="Tese">Tese</option>
+                <option value="TCCG">TCCG</option>
+            </select>
+            <button id="buscar-livros">Buscar Livros</button>
+            <ul id="resultado-busca-livros"></ul>
+        </div>
+
+        <h2>Lista de Autores</h2>
+        <button id="listar-autores">Listar Autores</button>
+        <ul id="lista-autores"></ul>
+
+        <h2>Lista de Livros</h2>
+        <button id="listar-livros">Listar Livros</button>
+        <ul id="lista-livros"></ul>
+
+        <!-- Modal para mostrar detalhes do livro -->
+        <div id="modal-detalhes-livro" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Detalhes do Livro</h2>
+                <p id="detalhes-livro"></p>
+            </div>
+        </div>
+
+        <!-- Modal para editar livro -->
+        <div id="modal-editar-livro" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Editar Livro</h2>
+                <form id="form-editar-livro">
+                    <input type="text" id="edit-titulo" placeholder="Título" required>
+                    <input type="text" id="edit-genero" placeholder="Gênero">
+                    <input type="text" id="edit-data-publicacao" placeholder="Data de Publicação">
+                    <input type="text" id="edit-localizacao" placeholder="Localização">
+                    <input type="text" id="edit-idioma" placeholder="Idioma">
+                    <select id="edit-tipo-obra" class="custom-select">
+                        <option value="Livro">Livro</option>
+                        <option value="Artigo">Artigo</option>
+                        <option value="Dissertação">Dissertação</option>
+                        <option value="Tese">Tese</option>
+                        <option value="TCCG">TCCG</option>
+                    </select>
+                    <label>Autores Primários (IDs separados por vírgula):</label>
+                    <input type="text" id="edit-autores-primarios" placeholder="Ex: 1,2,3">
+                    <label>Autores Secundários (IDs separados por vírgula):</label>
+                    <input type="text" id="edit-autores-secundarios" placeholder="Ex: 4,5">
+                    <button type="submit">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar seção apropriada baseado no tipo de usuário
+        const userRole = "{{ role }}";
+        if (userRole === 'administrador') {
+            $('#admin-section').removeClass('hidden');
+        } else if (userRole === 'leitor') {
+            $('#usuario-section').removeClass('hidden');
+        }
+
+        // Alternar exibição dos formulários
+        $('#tab-adicionar-autor').click(function() {
+            $('#form-adicionar-autor').slideToggle();
+        });
+
+        $('#tab-adicionar-livro').click(function() {
+            $('#form-adicionar-livro').slideToggle();
+        });
+
+        // Adicionar novo autor
+        $('#form-autor').submit(function(event) {
+            event.preventDefault();
+            const nome = $('#nome').val();
+            const nacionalidade = $('#nacionalidade').val();
+            const data_nascimento = $('#data_nascimento').val();
+            
+            $.ajax({
+                url: '/autores',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ nome, nacionalidade, data_nascimento }),
+                success: function(response) {
+                    alert(response.mensagem);
+                    $('#form-autor')[0].reset();
+                }
+            });
+        });
+
+        // Adicionar novo livro
+        $('#form-livro').submit(function(event) {
+            event.preventDefault();
+            const titulo = $('#titulo').val();
+            const genero = $('#genero').val();
+            const data_publicacao = $('#data_publicacao').val();
+            const localizacao = $('#localizacao').val();
+            const idioma = $('#idioma').val();
+            const tipo_obra = $('#tipo_obra').val();
+            const autores_primarios = $('#autores_primarios').val().split(',').map(id => parseInt(id.trim()));
+            const autores_secundarios = $('#autores_secundarios').val().split(',').map(id => parseInt(id.trim()));
+            
+            $.ajax({
+                url: '/livros',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 
+                    titulo, 
+                    genero, 
+                    data_publicacao, 
+                    localizacao, 
+                    idioma, 
+                    tipo_obra, 
+                    autores_primarios, 
+                    autores_secundarios 
+                }),
+                success: function(response) {
+                    alert(response.mensagem);
+                    $('#form-livro')[0].reset();
+                }
+            });
+        });
+
+        // Listar autores com botões de edição e exclusão apenas para administradores
+        $('#listar-autores').click(function() {
+            $.ajax({
+                url: '/autores',
+                method: 'GET',
+                success: function(response) {
+                    $('#lista-autores').empty();
+                    response.forEach(function(autor) {
+                        let buttons = '';
+                        if (userRole === 'administrador') {
+                            buttons = `
+                                <div class="action-buttons">
+                                    <button class="editar-autor" data-id="${autor.id}">Editar</button>
+                                    <button class="deletar-autor" data-id="${autor.id}">Excluir</button>
+                                </div>
+                            `;
+                        }
+                        $('#lista-autores').append(`
+                            <li>
+                                ID: ${autor.id}, Nome: ${autor.nome}, Nacionalidade: ${autor.nacionalidade}, Data de Nascimento: ${autor.data_nascimento}
+                                ${buttons}
+                            </li>
+                        `);
+                    });
+
+                    // Adiciona funcionalidade de editar e excluir apenas se o usuário for administrador
+                    if (userRole === 'administrador') {
+                        $('.editar-autor').click(function() {
+                            const id = $(this).data('id');
+                            const novoNome = prompt("Digite o novo nome:");
+                            const novaNacionalidade = prompt("Digite a nova nacionalidade:");
+                            const novaData = prompt("Digite a nova data de nascimento:");
+                            $.ajax({
+                                url: `/autores/${id}`,
+                                method: 'PUT',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ nome: novoNome, nacionalidade: novaNacionalidade, data_nascimento: novaData }),
+                                success: function(response) {
+                                    alert(response.mensagem);
+                                    $('#listar-autores').click(); // Recarrega a lista de autores
+                                }
+                            });
+                        });
+
+                        $('.deletar-autor').click(function() {
+                            const id = $(this).data('id');
+                            if (confirm("Tem certeza que deseja excluir este autor?")) {
+                                $.ajax({
+                                    url: `/autores/${id}`,
+                                    method: 'DELETE',
+                                    success: function(response) {
+                                        alert(response.mensagem);
+                                        $('#listar-autores').click(); // Recarrega a lista de autores
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        // Função para abrir modal com detalhes do livro
+        function abrirDetalhesLivro(livro) {
+			let detalhes = `
+				<strong>Título:</strong> ${livro.titulo}<br>
+				<strong>Gênero:</strong> ${livro.genero}<br>
+				<strong>Data de Publicação:</strong> ${livro.data_publicacao}<br>
+				<strong>Localização:</strong> ${livro.localizacao}<br>
+				<strong>Idioma:</strong> ${livro.idioma}<br>
+				<strong>Tipo de Obra:</strong> ${livro.tipo_obra}<br>
+				<strong>Autores Primários:</strong> ${livro.autores_primarios.map(a => a.nome).join(', ')}<br>
+				<strong>Autores Secundários:</strong> ${livro.autores_secundarios.map(a => a.nome).join(', ')}<br>
+			`;
+			$('#detalhes-livro').html(detalhes);
+			$('#modal-detalhes-livro').show();
+		}
+
+		// Listar livros
+		$('#listar-livros').click(function() {
+			$.ajax({
+				url: '/livros',
+				method: 'GET',
+				success: function(response) {
+					$('#lista-livros').empty();
+					const livrosListados = new Set(); // Usar Set para evitar duplicatas
+					if (Array.isArray(response) && response.length > 0) {
+						response.forEach(function(livro) {
+							if (!livrosListados.has(livro.id)) {
+								let buttons = '';
+                                if (userRole === 'administrador') {
+                                    buttons = `
+                                        <div class="action-buttons">
+                                            <button class="editar-livro" data-id="${livro.id}">Editar</button>
+                                            <button class="deletar-livro" data-id="${livro.id}">Excluir</button>
+                                        </div>
+                                    `;
+                                }
+								$('#lista-livros').append(`
+									<li>
+										Título: <a href="#" class="detalhes-livro" data-id="${livro.id}">${livro.titulo}</a>, Autor Principal: ${livro.autores_primarios.length > 0 ? livro.autores_primarios.map(a => a.nome).join(', ') : 'Nenhum'}
+                                        ${buttons}
+									</li>
+								`);
+								livrosListados.add(livro.id);
+							}
+						});
+
+						// Atribuir eventos para abrir o modal de detalhes do livro
+						$('.detalhes-livro').click(function(event) {
+							event.preventDefault();
+							const id = $(this).data('id');
+							$.ajax({
+								url: `/livros/${id}`,
+								method: 'GET',
+								success: function(response) {
+									abrirDetalhesLivro(response);
+								},
+								error: function(xhr) {
+									alert('Erro ao carregar detalhes do livro.');
+								}
+							});
+						});
+
+						// Atribuir eventos para editar livros
+                        $('.editar-livro').click(function() {
+                            const id = $(this).data('id');
+                            $.ajax({
+                                url: `/livros/${id}`,
+                                method: 'GET',
+                                success: function(livro) {
+                                    $('#edit-titulo').val(livro.titulo);
+                                    $('#edit-genero').val(livro.genero);
+                                    $('#edit-data-publicacao').val(livro.data_publicacao);
+                                    $('#edit-localizacao').val(livro.localizacao);
+                                    $('#edit-idioma').val(livro.idioma);
+                                    $('#edit-tipo-obra').val(livro.tipo_obra);
+                                    $('#edit-autores-primarios').val(livro.autores_primarios.map(a => a.id).join(', '));
+                                    $('#edit-autores-secundarios').val(livro.autores_secundarios.map(a => a.id).join(', '));
+                                    $('#form-editar-livro').data('livro-id', id);
+                                    $('#modal-editar-livro').show();
+                                }
+                            });
+                        });
+
+                        // Atribuir eventos para excluir livros
+                        $('.deletar-livro').click(function() {
+                            const id = $(this).data('id');
+                            if (confirm("Tem certeza que deseja excluir este livro?")) {
+                                $.ajax({
+                                    url: `/livros/${id}`,
+                                    method: 'DELETE',
+                                    success: function(response) {
+                                        alert(response.mensagem);
+                                        $('#listar-livros').click(); // Recarrega a lista de livros
+                                    }
+                                });
+                            }
+                        });
+					} else {
+						$('#lista-livros').html('<p>Nenhum livro encontrado.</p>');
+					}
+				},
+				error: function() {
+					$('#lista-livros').html('<p>Erro ao listar livros.</p>');
+				}
+			});
+		});
+
+		// Buscar livros
+		 $('#buscar-livros').click(function() {
+			const titulo = $('#busca-titulo').val();
+			const nome_autor = $('#busca-autor').val();
+			const genero = $('#busca-genero').val();
+			const data = $('#busca-data').val();
+			const localizacao = $('#busca-localizacao').val();
+			const idioma = $('#busca-idioma').val();
+			const tipo_obra = $('#busca-tipo-obra').val();
+			
+			$.ajax({
+				url: '/livros',
+				method: 'GET',
+				data: {
+					titulo: titulo,
+					nome_autor: nome_autor,
+					genero: genero,
+					data_publicacao: data,
+					localizacao: localizacao,
+					idioma: idioma,
+					tipo_obra: tipo_obra
+				},
+				success: function(response) {
+					$('#resultado-busca-livros').empty();
+					const livrosListados = new Set(); // Usar Set para evitar duplicatas
+
+					if (nome_autor.trim() === "") {
+						if (Array.isArray(response) && response.length > 0) {
+							response.forEach(function(livro) {
+								if (!livrosListados.has(livro.id)) {
+									$('#resultado-busca-livros').append(`
+										<li>
+											<a href="#" class="detalhes-livro" data-id="${livro.id}">${livro.titulo}</a>
+										</li>
+									`);
+									livrosListados.add(livro.id);
+								}
+							});
+						} else {
+							$('#resultado-busca-livros').html('<p>Nenhum livro encontrado.</p>');
+						}
+					} else {
+						if (response.livros_primarios.length > 0) {
+							$('#resultado-busca-livros').append('<h3>Autor Primário:</h3>');
+							response.livros_primarios.forEach(function(livro) {
+								if (!livrosListados.has(livro.id)) {
+									$('#resultado-busca-livros').append(`
+										<li>
+											<a href="#" class="detalhes-livro" data-id="${livro.id}">${livro.titulo}</a>
+										</li>
+									`);
+									livrosListados.add(livro.id);
+								}
+							});
+						} else {
+							$('#resultado-busca-livros').append('<h3>Autor Primário:</h3><p>Nenhum</p>');
+						}
+
+						if (response.livros_secundarios.length > 0) {
+							$('#resultado-busca-livros').append('<h3>Autor Secundário:</h3>');
+							response.livros_secundarios.forEach(function(livro) {
+								if (!livrosListados.has(livro.id)) {
+									$('#resultado-busca-livros').append(`
+										<li>
+											<a href="#" class="detalhes-livro" data-id="${livro.id}">${livro.titulo}</a>
+										</li>
+									`);
+									livrosListados.add(livro.id);
+								}
+							});
+						}
+					}
+
+					// Atribuir eventos para abrir o modal de detalhes do livro
+					$('.detalhes-livro').click(function(event) {
+						event.preventDefault();
+						const id = $(this).data('id');
+						$.ajax({
+							url: `/livros/${id}`,
+							method: 'GET',
+							success: function(response) {
+								abrirDetalhesLivro(response);
+							},
+							error: function(xhr) {
+								alert('Erro ao carregar detalhes do livro.');
+							}
+						});
+					});
+				},
+				error: function() {
+					$('#resultado-busca-livros').html('<p>Erro ao buscar livros.</p>');
+				}
+			});
+		});
+
+		// Fechar modais
+		$('.close').click(function() {
+			$('#modal-detalhes-livro').hide();
+            $('#modal-editar-livro').hide();
+		});
+
+        // Enviar formulário de edição de livro
+        $('#form-editar-livro').submit(function(event) {
+            event.preventDefault();
+            const id = $(this).data('livro-id');
+            const titulo = $('#edit-titulo').val();
+            const genero = $('#edit-genero').val();
+            const data_publicacao = $('#edit-data-publicacao').val();
+            const localizacao = $('#edit-localizacao').val();
+            const idioma = $('#edit-idioma').val();
+            const tipo_obra = $('#edit-tipo-obra').val();
+            const autores_primarios = $('#edit-autores-primarios').val().split(',').map(id => parseInt(id.trim()));
+            const autores_secundarios = $('#edit-autores-secundarios').val().split(',').map(id => parseInt(id.trim()));
+
+            $.ajax({
+                url: `/livros/${id}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    titulo,
+                    genero,
+                    data_publicacao,
+                    localizacao,
+                    idioma,
+                    tipo_obra,
+                    autores_primarios,
+                    autores_secundarios
+                }),
+                success: function(response) {
+                    alert(response.mensagem);
+                    $('#modal-editar-livro').hide();
+                    $('#listar-livros').click(); // Recarrega a lista de livros
+                }
+            });
+        });
+    </script>
+</body>
+</html>

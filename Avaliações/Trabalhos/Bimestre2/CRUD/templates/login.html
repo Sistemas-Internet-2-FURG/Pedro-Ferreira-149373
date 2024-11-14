@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Biblioteca</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <img src="/static/FURG_logo.png" alt="Logo FURG" class="logo">
+
+    <div class="login-container">
+        <h2 id="form-title">Login na Biblioteca</h2>
+
+        <!-- Formulário de Login -->
+        <form id="login-form" class="login-form">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit" id="login-button">Entrar</button>
+        </form>
+
+        <!-- Formulário de Registro -->
+        <form id="register-form" class="register-form hidden">
+            <div class="toggle-role">
+                <button type="button" id="toggle-reader" class="active">Leitor</button>
+                <button type="button" id="toggle-admin">Administrador</button>
+            </div>
+            <label for="new-username">Usuário:</label>
+            <input type="text" id="new-username" name="new_username" required>
+            
+            <label for="new-password">Senha:</label>
+            <input type="password" id="new-password" name="new_password" required>
+            
+            <input type="hidden" name="new_role" id="new-role" value="leitor">
+            
+            <button type="submit" id="register-button">Registrar</button>
+        </form>
+
+        <p id="toggle-text">Não tem uma conta? <span id="toggle-link">Clique aqui para registrar-se!</span></p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/login.js"></script>
+    <script src="/static/register.js"></script>
+    <script>
+        // Alternar entre formulários de login e registro
+        $(document).ready(function() {
+            $('.toggle-role button').click(function() {
+                $('.toggle-role button').removeClass('active');
+                $(this).addClass('active');
+                const role = $(this).text().toLowerCase();
+                $('#new-role').val(role);
+            });
+
+            $('#toggle-link').click(function() {
+                $('.login-form, .register-form').toggleClass('hidden');
+                const title = $('#form-title').text() === 'Login na Biblioteca' ? 'Registro na Biblioteca' : 'Login na Biblioteca';
+                $('#form-title').text(title);
+                $('#toggle-text').html(title === 'Login na Biblioteca' ? 
+                    'Não tem uma conta? <span id="toggle-link">Clique aqui para registrar-se!</span>' :
+                    'Já tem uma conta? <span id="toggle-link">Clique aqui para fazer login!</span>');
+            });
+        });
+    </script>
+</body>
+</html>

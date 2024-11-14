@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração da Biblioteca</title>
+    <link rel="stylesheet" href="/static/admin.css">
+    <script src="/static/admin.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Administração da Biblioteca</h1>
+        <button id="logout-button">Logout</button>
+
+        <h2>Adicionar Novo Autor</h2>
+        <form id="form-autor">
+            <input type="text" id="autor-nome" placeholder="Nome" required>
+            <input type="text" id="autor-nacionalidade" placeholder="Nacionalidade">
+            <input type="text" id="autor-data" placeholder="Data de Nascimento">
+            <button type="button" id="add-autor-button">Adicionar Autor</button>
+        </form>
+
+        <h3>Lista de Autores</h3>
+        <button id="listar-autores">Listar Autores</button>
+        <ul id="lista-autores"></ul>
+
+        <h2>Adicionar Novo Livro</h2>
+        <form id="form-livro">
+            <input type="text" id="livro-titulo" placeholder="Título" required>
+            <input type="text" id="livro-genero" placeholder="Gênero">
+            <input type="text" id="livro-data" placeholder="Data de Publicação">
+            <input type="text" id="livro-localizacao" placeholder="Localização">
+            <input type="text" id="livro-idioma" placeholder="Idioma">
+            <select id="livro-tipo">
+                <option value="Livro">Livro</option>
+                <option value="Artigo">Artigo</option>
+                <option value="Dissertação">Dissertação</option>
+                <option value="Tese">Tese</option>
+                <option value="TCCG">TCCG</option>
+            </select>
+            <input type="text" id="livro-autores-primarios" placeholder="IDs Autores Primários (ex: 1,2,3)">
+            <input type="text" id="livro-autores-secundarios" placeholder="IDs Autores Secundários (ex: 4,5)">
+            <button type="button" id="add-livro-button">Adicionar Livro</button>
+        </form>
+
+        <h3>Lista de Livros</h3>
+        <button id="listar-livros">Listar Livros</button>
+        <ul id="lista-livros"></ul>
+    </div>
+</body>
+</html>
